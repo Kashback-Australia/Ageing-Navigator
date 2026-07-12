@@ -1,0 +1,2571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ageing Navigator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sage:       #3D6B5F;
+    --sage-light: #EAF2EF;
+    --sage-mid:   #C4DDD8;
+    --warm-white: #FAF8F5;
+    --charcoal:   #1E1E1E;
+    --mid-grey:   #4A4A4A;
+    --light-grey: #E0DBD5;
+    --amber:      #B8692E;
+    --amber-light:#FDF3EA;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--warm-white);
+    color: var(--charcoal);
+    min-height: 100vh;
+    font-size: 18px;
+    -webkit-text-size-adjust: 100%;
+    padding-bottom: 76px;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1.5px solid var(--light-grey);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+    z-index: 200;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+  }
+
+  .bottom-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 20px;
+    border-radius: 10px;
+    min-width: 64px;
+    position: relative;
+  }
+
+  .bottom-nav-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  .bottom-nav-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--mid-grey);
+    letter-spacing: 0.01em;
+  }
+
+  .bottom-nav-btn.active .bottom-nav-label,
+  .bottom-nav-btn.active .bottom-nav-icon {
+    color: var(--sage);
+  }
+
+  .bottom-nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 10px;
+    background: var(--amber);
+    color: white;
+    font-size: 0.62rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+
+  /* FAVOURITE BUTTON ON ROWS */
+  .fav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 6px;
+    flex-shrink: 0;
+    line-height: 1;
+    color: var(--light-grey);
+  }
+  .fav-btn.is-fav { color: var(--amber); }
+
+  .page-fav-btn {
+    background: none;
+    border: 1.5px solid var(--light-grey);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 7px 13px;
+    border-radius: 6px;
+    line-height: 1;
+    color: var(--mid-grey);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+  }
+  .page-fav-btn .page-fav-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .page-fav-btn.is-fav {
+    color: var(--amber);
+    border-color: var(--amber-light);
+    background: var(--amber-light);
+  }
+
+  /* FAVOURITES SCREEN */
+  .fav-empty {
+    text-align: center;
+    padding: 60px 28px;
+    color: var(--mid-grey);
+  }
+  .fav-empty-icon { font-size: 2.5rem; margin-bottom: 16px; }
+  .fav-empty-title {
+    font-family: 'Lora', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+  }
+  .fav-empty-text { font-size: 0.95rem; line-height: 1.6; }
+
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: var(--warm-white);
+    border-bottom: 2px solid var(--light-grey);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    font-family: 'Lora', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--charcoal);
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .nav-logo strong {
+    color: var(--sage);
+    font-weight: 600;
+  }
+
+  .nav-links { display: flex; gap: 20px; align-items: center; }
+  .nav-links a {
+    font-size: 0.9rem;
+    color: var(--mid-grey);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 4px;
+  }
+  .nav-links a:hover { color: var(--sage); }
+  .nav-cta {
+    background: var(--sage);
+    color: white !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem !important;
+  }
+
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: white;
+    background: var(--sage);
+    cursor: pointer;
+    font-weight: 600;
+    border: none;
+    padding: 7px 13px;
+    border-radius: 6px;
+    min-height: 36px;
+  }
+  .nav-back:hover { background: #2f5449; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--sage) 0%, #2f5449 100%);
+    padding: 24px 24px 28px;
+    max-width: 100%;
+    margin: 0;
+    text-align: center;
+  }
+  .hero > .hero-sub {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.9);
+    font-weight: 400;
+    max-width: 100%;
+    margin: 0;
+  }
+  .hero-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 10px;
+    display: block;
+  }
+  .hero-sub {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.9);
+    font-weight: 400;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  /* STATE BAR */
+  .state-bar {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 24px 28px 0;
+  }
+  .state-label {
+    font-size: 0.85rem;
+    color: var(--mid-grey);
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .state-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .state-chip {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 24px;
+    border: 2px solid var(--light-grey);
+    background: white;
+    color: var(--mid-grey);
+    cursor: pointer;
+    transition: all 0.15s;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .state-chip:hover, .state-chip.active {
+    border-color: var(--sage);
+    background: var(--sage);
+    color: white;
+  }
+
+  /* PERSON BANNER */
+  .person-banner {
+    background: var(--sage);
+    padding: 14px 28px;
+    cursor: pointer;
+  }
+  .person-banner:hover { background: #2f5449; }
+  .person-banner-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .person-banner-text {
+    font-size: 0.95rem;
+    color: white;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+  .person-banner-text strong { font-weight: 700; }
+  .person-banner-arrow {
+    color: white;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  /* WHERE ARE YOU */
+  .where-section {
+    background: var(--sage-light);
+    border-top: 2px solid var(--sage-mid);
+    border-bottom: 2px solid var(--sage-mid);
+    padding: 20px 28px 28px;
+    margin-top: 0;
+  }
+  .where-inner { max-width: 680px; margin: 0 auto; }
+  .where-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 10px;
+  }
+  .where-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+  .journey-cards { display: flex; flex-direction: column; gap: 14px; }
+  .journey-card {
+    background: white;
+    border: 2px solid var(--sage-mid);
+    border-radius: 12px;
+    padding: 22px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    text-align: left;
+    min-height: 80px;
+  }
+  .journey-card:hover {
+    border-color: var(--sage);
+    box-shadow: 0 3px 16px rgba(61,107,95,0.14);
+  }
+  .journey-card-left { flex: 1; }
+  .journey-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 5px;
+    line-height: 1.35;
+  }
+  .journey-card-desc {
+    font-size: 0.9rem;
+    color: var(--mid-grey);
+    line-height: 1.45;
+    font-weight: 400;
+  }
+  .journey-arrow {
+    color: var(--sage);
+    font-size: 1.4rem;
+    margin-left: 20px;
+    flex-shrink: 0;
+    font-weight: 300;
+  }
+
+  /* SECTIONS LIST */
+  .sections-area { max-width: 680px; margin: 0 auto; padding: 44px 28px; }
+  .sections-heading {
+    font-family: 'Lora', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+  }
+  .sections-sub {
+    font-size: 0.9rem;
+    color: var(--mid-grey);
+    margin-bottom: 28px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .sections-list { display: flex; flex-direction: column; gap: 2px; }
+  .section-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    gap: 14px;
+    min-height: 60px;
+    border: 1.5px solid var(--light-grey);
+    background: white;
+    margin-bottom: 8px;
+  }
+  .section-row:hover {
+    background: var(--sage-light);
+    border-color: var(--sage-mid);
+  }
+  .section-number {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--sage);
+    width: 22px;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+  .section-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--charcoal);
+    flex: 1;
+    line-height: 1.35;
+  }
+  .section-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+  .section-row-featured {
+    background: var(--sage-light) !important;
+    border-color: var(--sage) !important;
+    border-width: 2px !important;
+  }
+  .tag-read-first {
+    background: var(--sage);
+    color: white;
+  }
+  .tag-draft { background: var(--sage-light); color: var(--sage); border: 1px solid var(--sage-mid); }
+  .section-chevron {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: white;
+    background: var(--sage);
+    padding: 6px 12px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+  .section-divider { height: 1px; background: var(--light-grey); margin: 10px 0; }
+
+  /* STATE SECTION */
+  .state-section {
+    background: var(--sage-light);
+    border-top: 2px solid var(--sage-mid);
+    border-bottom: 2px solid var(--sage-mid);
+    padding: 36px 28px;
+  }
+  .state-inner { max-width: 680px; margin: 0 auto; }
+  .state-section-label {
+    font-family: 'Lora', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+  }
+  .state-section-sub {
+    font-size: 0.9rem;
+    color: var(--mid-grey);
+    margin-bottom: 20px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  /* RESOURCE LIBRARY */
+  .library-area { background: #EDE8E1; padding: 44px 28px; }
+  .library-inner { max-width: 680px; margin: 0 auto; }
+  .library-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 10px;
+  }
+  .library-heading {
+    font-family: 'Lora', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 10px;
+  }
+  .library-sub {
+    font-size: 0.95rem;
+    color: var(--mid-grey);
+    margin-bottom: 28px;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+  .library-search {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid var(--light-grey);
+    border-radius: 10px;
+    padding: 14px 18px;
+    gap: 12px;
+    margin-bottom: 20px;
+    min-height: 54px;
+  }
+  .library-search-icon { color: var(--mid-grey); font-size: 1rem; }
+  .library-search input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--charcoal);
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+  }
+  .library-search input::placeholder { color: #9B9B9B; }
+  .library-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+  .lib-chip {
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 24px;
+    border: 1.5px solid var(--light-grey);
+    color: var(--mid-grey);
+    background: white;
+    cursor: pointer;
+    transition: all 0.15s;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .lib-chip:hover, .lib-chip.active {
+    border-color: var(--sage);
+    color: white;
+    background: var(--sage);
+  }
+  .library-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .lib-card {
+    background: white;
+    border: 1.5px solid var(--light-grey);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .lib-card:hover { border-color: var(--sage); box-shadow: 0 2px 12px rgba(61,107,95,0.1); }
+  .lib-card-icon { font-size: 1.5rem; margin-bottom: 12px; }
+  .lib-card-title { font-size: 0.95rem; font-weight: 600; color: var(--charcoal); margin-bottom: 6px; line-height: 1.35; }
+  .lib-card-type { font-size: 0.75rem; color: var(--mid-grey); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* FOOTER */
+  footer { padding: 32px 28px; text-align: center; border-top: 1px solid var(--light-grey); }
+  .footer-text { font-size: 0.85rem; color: var(--mid-grey); line-height: 1.7; font-weight: 400; }
+  .footer-text a { color: var(--sage); text-decoration: none; }
+
+  /* TIPS AND QUESTIONS BOX */
+  .tips-box {
+    background: var(--sage-light);
+    border: 2px solid var(--sage-mid);
+    border-left: 5px solid var(--sage);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin: 32px 0;
+  }
+  .tips-box-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .tips-box-icon { font-size: 1.1rem; }
+  .tips-box-title {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--sage);
+    letter-spacing: -0.01em;
+  }
+  .tips-box h3 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--sage);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin: 14px 0 8px;
+    border: none;
+    padding: 0;
+  }
+  .tips-box ul {
+    margin: 0 0 4px 18px;
+    line-height: 1.85;
+    color: var(--charcoal);
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+  .tips-box ul li { margin-bottom: 4px; }
+
+  /* SECTION PAGE */
+  .section-page-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--warm-white);
+    border-bottom: 2px solid var(--light-grey);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .section-page-content {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 52px 28px 88px;
+  }
+
+  .section-page-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 14px;
+  }
+
+  .section-page-title {
+    font-family: 'Lora', serif;
+    font-size: 2.1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--charcoal);
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+  }
+
+  .reading-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--mid-grey);
+    font-weight: 400;
+    margin-bottom: 36px;
+    background: var(--sage-light);
+    padding: 6px 14px;
+    border-radius: 20px;
+  }
+
+  .section-body p {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--charcoal);
+    margin-bottom: 22px;
+    font-weight: 400;
+  }
+
+  .section-body h2 {
+    font-family: 'Lora', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-top: 44px;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--light-grey);
+  }
+
+  .section-body ul {
+    margin: 10px 0 24px 24px;
+    line-height: 2.1;
+    color: var(--charcoal);
+    font-size: 1.05rem;
+    font-weight: 400;
+  }
+
+  .section-body strong {
+    font-weight: 600;
+    color: var(--charcoal);
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 4px;
+    font-size: 1rem;
+  }
+
+  .section-nav-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 60px;
+    padding-top: 28px;
+    border-top: 2px solid var(--light-grey);
+    gap: 16px;
+  }
+
+  .section-nav-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 12px 0;
+    text-align: left;
+    min-height: 56px;
+  }
+  .section-nav-btn.next { text-align: right; }
+
+  .section-nav-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mid-grey);
+  }
+  .section-nav-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--sage);
+    line-height: 1.3;
+  }
+
+  @media (max-width: 520px) {
+    .hero h1 { font-size: 1.85rem; }
+    .library-cards { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .section-page-title { font-size: 1.65rem; }
+    .hero { padding: 40px 20px 36px; }
+    .where-section { padding: 36px 20px; }
+    .sections-area { padding: 36px 20px; }
+  }
+  /* ============================================
+     DESKTOP LAYOUT — Option 2 editorial style
+     1024px and above — mobile untouched
+     ============================================ */
+
+  @media (min-width: 1024px) {
+
+    body { font-size: 16px; padding-bottom: 0; }
+
+    /* HIDE MOBILE ELEMENTS */
+    .bottom-nav { display: none; }
+    .where-section { display: none; }
+    .home-desktop-wrapper { display: block; }
+    .home-desktop-left { display: none; }
+    .home-desktop-right { display: block; }
+
+    /* ---- TOP NAV ---- */
+    nav {
+      padding: 0 48px;
+      height: 60px;
+      border-bottom: 1px solid var(--light-grey);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo { font-size: 1.2rem; }
+    .nav-links { display: flex; gap: 0; align-items: center; }
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mid-grey);
+      text-decoration: none;
+      padding: 0 16px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      border-bottom: 2.5px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.12s, border-color 0.12s;
+    }
+    .nav-links a:hover { color: var(--sage); border-bottom-color: var(--sage); }
+    .nav-cta {
+      background: var(--sage) !important;
+      color: white !important;
+      padding: 8px 18px !important;
+      border-radius: 7px !important;
+      height: auto !important;
+      border-bottom: none !important;
+      margin-left: 16px;
+      font-size: 13px !important;
+    }
+
+    /* ---- HERO — full width split ---- */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: linear-gradient(135deg, var(--sage) 0%, #2f5449 100%);
+      min-height: 200px;
+      padding: 0;
+      max-width: 100%;
+      text-align: left;
+      margin: 0;
+    }
+    .hero-left {
+      padding: 44px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .hero-eyebrow {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 14px;
+    }
+    .hero-sub {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: white;
+      line-height: 1.45;
+      margin-bottom: 0;
+      max-width: 100%;
+    }
+    .hero-right {
+      padding: 28px 48px 28px 36px;
+      border-left: 1px solid rgba(255,255,255,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: rgba(0,0,0,0.15);
+    }
+    .hero-right-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .hero-journey-cards { display: flex; flex-direction: column; gap: 8px; }
+    .hero-jcard {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .hero-jcard:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.4); }
+    .hero-jcard-title { font-size: 13.5px; font-weight: 600; color: white; line-height: 1.3; }
+    .hero-jcard-desc { font-size: 11.5px; color: rgba(255,255,255,0.7); margin-top: 3px; }
+    .hero-jcard-arrow { color: rgba(255,255,255,0.6); font-size: 16px; margin-left: 12px; flex-shrink: 0; }
+
+    /* ---- FEATURED BANNER ---- */
+    .desktop-featured {
+      display: flex !important;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--sage-light);
+      border-bottom: 2px solid var(--sage-mid);
+      padding: 14px 48px;
+    }
+    .df-left { display: flex; align-items: center; gap: 14px; }
+    .df-badge {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; background: var(--sage); color: white;
+      padding: 3px 8px; border-radius: 4px; flex-shrink: 0;
+    }
+    .df-title { font-size: 16px; font-weight: 600; color: var(--charcoal); }
+    .df-desc { font-size: 13px; color: var(--mid-grey); margin-top: 3px; }
+    .df-btn {
+      font-size: 13px; font-weight: 600; color: var(--sage);
+      background: white; border: 1.5px solid var(--sage-mid);
+      padding: 10px 18px; border-radius: 7px; cursor: pointer;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .df-btn:hover { border-color: var(--sage); }
+
+    /* ---- SECTIONS GRID ---- */
+    .sections-area { padding: 32px 48px 48px; max-width: 100%; }
+    .sections-heading { display: none; }
+    .sections-sub { display: none; }
+    .sections-list { display: none; }
+
+    .desktop-group { margin-bottom: 32px; }
+    .desktop-group-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--sage);
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 2px solid var(--sage-mid);
+    }
+    .desktop-group-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .desktop-card {
+      background: white; border: 1.5px solid var(--light-grey);
+      border-radius: 10px; padding: 18px 18px; cursor: pointer;
+      transition: border-color 0.12s, box-shadow 0.12s;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .desktop-card:hover { border-color: var(--sage-mid); box-shadow: 0 2px 12px rgba(61,107,95,0.1); }
+    .dc-num { font-size: 10px; font-weight: 700; color: var(--sage); letter-spacing: 0.04em; }
+    .dc-title { font-size: 14px; font-weight: 600; color: var(--charcoal); line-height: 1.35; }
+    .dc-desc { font-size: 12.5px; color: var(--mid-grey); line-height: 1.5; }
+    .dc-tag {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; padding: 3px 8px; border-radius: 4px;
+      display: inline-block; margin-top: 6px; align-self: flex-start;
+    }
+    .dc-tag-draft { background: var(--sage-light); color: var(--sage); border: 1px solid var(--sage-mid); }
+    .dc-tag-review { background: var(--amber-light); color: var(--amber); }
+    .dc-tag-soon { background: var(--light-grey); color: var(--mid-grey); }
+
+    /* ---- STATE SECTION ---- */
+    .state-section { padding: 22px 48px; }
+    .state-inner { max-width: 100%; }
+
+    /* ---- LIBRARY ---- */
+    .library-area { padding: 40px 48px; }
+    .library-inner { max-width: 100%; }
+    .library-cards { grid-template-columns: repeat(4, 1fr); }
+
+    /* ---- FOOTER ---- */
+    footer { padding: 28px 48px; }
+
+    /* ---- SECTION PAGE ---- */
+    .section-page-nav {
+      padding: 0 48px; height: 60px;
+      border-bottom: 1px solid var(--light-grey);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-back {
+      font-size: 12px; font-weight: 600; color: white;
+      background: var(--sage); padding: 7px 14px;
+      border-radius: 6px; min-height: auto;
+    }
+    .section-page-content {
+      max-width: 740px; margin: 0 auto; padding: 52px 48px 88px;
+    }
+    .section-page-title { font-size: 2.4rem; letter-spacing: -0.02em; }
+    .section-body p { font-size: 1.1rem; line-height: 1.9; }
+    .section-body h2 { font-size: 1.4rem; margin-top: 44px; }
+    .section-body ul { font-size: 1.1rem; line-height: 2.1; }
+    .reading-time { margin-bottom: 28px; font-size: 0.9rem; }
+    .tips-box { padding: 24px 28px; }
+    .tips-box ul { font-size: 1rem; line-height: 2; }
+    .tips-box-title { font-size: 1.1rem; }
+
+    /* ---- NEXT SECTION CARD ---- */
+    .desktop-next-card {
+      background: white; border: 1.5px solid var(--light-grey);
+      border-radius: 10px; padding: 20px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 52px; cursor: pointer; transition: border-color 0.12s;
+    }
+    .desktop-next-card:hover { border-color: var(--sage-mid); }
+    .dnc-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mid-grey); margin-bottom: 5px; }
+    .dnc-title { font-size: 15px; font-weight: 600; color: var(--charcoal); }
+    .dnc-desc { font-size: 12px; color: var(--mid-grey); margin-top: 3px; }
+    .dnc-arrow { color: var(--sage); font-size: 22px; margin-left: 16px; flex-shrink: 0; }
+  }
+
+  @media (min-width: 1280px) {
+    .desktop-group-grid { grid-template-columns: repeat(5, 1fr); }
+    .library-cards { grid-template-columns: repeat(5, 1fr); }
+  }
+
+  @media (min-width: 1440px) {
+    nav, .section-page-nav { padding-left: 64px; padding-right: 64px; }
+    .sections-area, .library-area, .state-section, footer { padding-left: 64px; padding-right: 64px; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- HOME SCREEN -->
+<div id="screen-home" class="screen active">
+
+  <nav>
+    <div class="nav-logo" onclick="showHome()">Ageing <strong>Navigator</strong></div>
+    <div class="nav-links">
+      <a href="#">Sections</a>
+      <a href="#">Resources</a>
+      <a href="#">About</a>
+      <a href="#" class="nav-cta">Get started</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <!-- Mobile only tagline -->
+    <p class="hero-sub" style="padding: 20px 24px; color: white; font-size: 1.2rem; line-height: 1.65; display: block; font-family: 'Lora', serif; font-style: normal; font-weight: 400; letter-spacing: 0.01em;">Real information for anyone navigating the journey of ageing — and those walking alongside them.</p>
+    <div class="hero-left">
+      <span class="hero-eyebrow">For older Australians and their families</span>
+      <p class="hero-sub">Real information for anyone navigating the journey of ageing — and those walking alongside them.</p>
+    </div>
+    <div class="hero-right">
+      <div class="hero-right-label">Where are you right now?</div>
+      <div class="hero-journey-cards">
+        <div class="hero-jcard" onclick="showSection('juststarting')">
+          <div><div class="hero-jcard-title">I'm just starting to think about this</div><div class="hero-jcard-desc">Things seem fine, but I want to be prepared.</div></div>
+          <div class="hero-jcard-arrow">→</div>
+        </div>
+        <div class="hero-jcard">
+          <div><div class="hero-jcard-title">Something has changed and we need help now</div><div class="hero-jcard-desc">A fall, a hospital visit, or a moment that made it real.</div></div>
+          <div class="hero-jcard-arrow">→</div>
+        </div>
+        <div class="hero-jcard">
+          <div><div class="hero-jcard-title">We're waiting for an assessment</div><div class="hero-jcard-desc">We've contacted My Aged Care. What happens next?</div></div>
+          <div class="hero-jcard-arrow">→</div>
+        </div>
+        <div class="hero-jcard">
+          <div><div class="hero-jcard-title">We're already receiving support</div><div class="hero-jcard-desc">Help is in place but we need guidance day to day.</div></div>
+          <div class="hero-jcard-arrow">→</div>
+        </div>
+        <div class="hero-jcard">
+          <div><div class="hero-jcard-title">We're thinking about residential care</div><div class="hero-jcard-desc">Staying at home is becoming difficult.</div></div>
+          <div class="hero-jcard-arrow">→</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESKTOP LAYOUT WRAPPER -->
+  <div class="home-desktop-wrapper">
+
+    <!-- DESKTOP LEFT SIDEBAR -->
+    <div class="home-desktop-left">
+      <section class="where-section">
+        <div class="where-inner">
+          <div class="where-label">Start here</div>
+      <div class="journey-cards">
+        <div class="journey-card" onclick="showSection('juststarting')">
+          <div class="journey-card-left">
+            <div class="journey-card-title">I'm just starting to think about this</div>
+            <div class="journey-card-desc">Things seem fine, but I want to be prepared for what's ahead.</div>
+          </div>
+          <div class="journey-arrow">→</div>
+        </div>
+        <div class="journey-card">
+          <div class="journey-card-left">
+            <div class="journey-card-title">Something has changed and we need help now</div>
+            <div class="journey-card-desc">A fall, a hospital visit, or a moment that made it real.</div>
+          </div>
+          <div class="journey-arrow">→</div>
+        </div>
+        <div class="journey-card">
+          <div class="journey-card-left">
+            <div class="journey-card-title">We're waiting for an assessment</div>
+            <div class="journey-card-desc">We've contacted My Aged Care or a doctor. What happens next?</div>
+          </div>
+          <div class="journey-arrow">→</div>
+        </div>
+        <div class="journey-card">
+          <div class="journey-card-left">
+            <div class="journey-card-title">We're already receiving support</div>
+            <div class="journey-card-desc">Help is in place but we need guidance on managing it day to day.</div>
+          </div>
+          <div class="journey-arrow">→</div>
+        </div>
+        <div class="journey-card">
+          <div class="journey-card-left">
+            <div class="journey-card-title">We're thinking about residential care</div>
+            <div class="journey-card-desc">Staying at home is becoming difficult. We're looking at options.</div>
+          </div>
+          <div class="journey-arrow">→</div>
+        </div>
+      </div>
+    </div>
+  </section>
+    </div><!-- end home-desktop-left -->
+
+    <!-- DESKTOP RIGHT CONTENT -->
+    <div class="home-desktop-right">
+
+  <section class="sections-area">
+    <div class="sections-heading" style="color: var(--sage); font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;">Read more here</div>
+    <p class="sections-sub">The complete guide — read in order or go straight to what you need.</p>
+    <div class="sections-list">
+
+      <div class="section-row section-row-featured" style="flex-direction: column; align-items: flex-start; gap: 8px;" onclick="showSection('personcentred')" >
+        <span class="section-tag tag-read-first">Read first</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <span class="section-title" style="font-weight: 600;">Person Centred Care — The Individual</span>
+          <span class="section-tag tag-draft" style="margin-right: 8px;">Draft ready</span>
+          <button class="fav-btn" data-fav-id="personcentred" onclick="toggleFavourite('personcentred', 'Person Centred Care — The Individual', 'personcentred', event)">☆</button>
+          <span class="section-chevron">Read →</span>
+        </div>
+      </div>
+
+      <div class="section-row" onclick="showSection('bigpicture')">
+        
+        <span class="section-title">The Aged Care System</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="bigpicture" onclick="toggleFavourite('bigpicture', 'The Aged Care System', 'bigpicture', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+
+      
+
+      <div class="section-row" onclick="showSection('recognising')">
+        
+        <span class="section-title">Recognising When Help Is Needed</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="recognising" onclick="toggleFavourite('recognising', 'Recognising When Help Is Needed', 'recognising', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row" onclick="showSection('workingout')">
+        
+        <span class="section-title">Working Out What Help Is Needed</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="workingout" onclick="toggleFavourite('workingout', 'Working Out What Help Is Needed', 'workingout', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row" onclick="showSection('balancing')">
+        
+        <span class="section-title">Balancing Help and Independence</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="balancing" onclick="toggleFavourite('balancing', 'Balancing Help and Independence', 'balancing', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row" onclick="showSection('whathelp')">
+        
+        <span class="section-title">What Help Is Available</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="whathelp" onclick="toggleFavourite('whathelp', 'What Help Is Available', 'whathelp', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+
+      
+
+      <div class="section-row" onclick="showSection('findingaccessing')">
+        
+        <span class="section-title">Finding and Accessing Support</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="findingaccessing" onclick="toggleFavourite('findingaccessing', 'Finding and Accessing Support', 'findingaccessing', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row" onclick="showSection('myagedcare')">
+        <span class="section-title">My Aged Care</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="myagedcare" onclick="toggleFavourite('myagedcare', 'My Aged Care', 'myagedcare', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row" onclick="showSection('assessment')">
+        
+        <span class="section-title">The Aged Care Assessment</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="assessment" onclick="toggleFavourite('assessment', 'The Aged Care Assessment', 'assessment', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row" onclick="showSection('preparing')">
+        
+        <span class="section-title">Preparing for Assessment</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="preparing" onclick="toggleFavourite('preparing', 'Preparing for Assessment', 'preparing', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row">
+        <span class="section-title">Assessment Outcome — Now What?</span>
+        <span class="section-chevron">Read →</span>
+      </div>
+
+      
+
+      <div class="section-row">
+        
+        <span class="section-title">Support at Home</span>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row">
+        
+        <span class="section-title">Retirement Villages and Over 55 Communities</span>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row">
+        
+        <span class="section-title">Residential Aged Care</span>
+        <span class="section-chevron">Read →</span>
+      </div>
+
+      
+
+      <div class="section-row">
+        
+        <span class="section-title">Managing in the System</span>
+        <span class="section-chevron">Read →</span>
+      </div>
+      <div class="section-row" onclick="showSection('costsfees')">
+        
+        <span class="section-title">Costs and Fees</span>
+        <span class="section-tag" style="background: var(--light-grey); color: var(--mid-grey);">Needs review</span>
+        <button class="fav-btn" data-fav-id="costsfees" onclick="toggleFavourite('costsfees', 'Costs and Fees', 'costsfees', event)">☆</button>
+        <span class="section-chevron">Read →</span>
+      </div>
+
+      <div class="section-row">
+        
+        <span class="section-title">Legal and Documents</span>
+        <span class="section-chevron">Read →</span>
+      </div>
+
+    </div>
+  </section>
+
+    </div><!-- end home-desktop-right -->
+  </div><!-- end home-desktop-wrapper -->
+
+  <!-- DESKTOP FEATURED BANNER — hidden on mobile -->
+  <div class="desktop-featured" style="display:none;" onclick="showSection('personcentred')">
+    <div class="df-left">
+      <div class="df-badge">Read first</div>
+      <div>
+        <div class="df-title">Person Centred Care — The Individual</div>
+        <div class="df-desc">The thinking behind everything else in this app. Start here before anything else.</div>
+      </div>
+    </div>
+    <button class="df-btn">Read now →</button>
+  </div>
+
+  <!-- DESKTOP SECTION CARD GROUPS — hidden on mobile -->
+  <section class="sections-area desktop-sections-area" style="display:none;">
+
+    <div class="desktop-group">
+      <div class="desktop-group-label">Getting started</div>
+      <div class="desktop-group-grid">
+        <div class="desktop-card" onclick="showSection('bigpicture')">
+          <div class="dc-title">The Aged Care System</div>
+          <div class="dc-desc">Federal, state, council and community supports — who does what.</div>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
+        </div>
+        <div class="desktop-card" onclick="showSection('recognising')">
+          <div class="dc-title">Recognising When Help Is Needed</div>
+          <div class="dc-desc">The signs to watch for and how to respond early.</div>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
+        </div>
+        <div class="desktop-card" onclick="showSection('workingout')">
+          <div class="dc-title">Working Out What Help Is Needed</div>
+          <div class="dc-desc">What matters, what's become difficult, and where the gaps are.</div>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
+        </div>
+        <div class="desktop-card" onclick="showSection('balancing')">
+          <div class="dc-title">Balancing Help and Independence</div>
+          <div class="dc-desc">Why doing too much too soon has a cost.</div>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="desktop-group">
+      <div class="desktop-group-label">Accessing support</div>
+      <div class="desktop-group-grid">
+        <div class="desktop-card" onclick="showSection('whathelp')">
+          <div class="dc-title">What Help Is Available</div>
+          <div class="dc-desc">The full range of services across all levels of support.</div>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
+        </div>
+        <div class="desktop-card" onclick="showSection('findingaccessing')">
+          <div class="dc-title">Finding and Accessing Support</div>
+          <div class="dc-desc">How to make contact with each part of the system.</div>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="desktop-group">
+      <div class="desktop-group-label">My Aged Care</div>
+      <div class="desktop-group-grid">
+        <div class="desktop-card" onclick="showSection('myagedcare')">
+          <div class="dc-title">My Aged Care</div>
+          <div class="dc-desc">The federal government's front door to aged care services.</div>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
+        </div>
+        <div class="desktop-card" onclick="showSection('assessment')">
+          <div class="dc-title">The Aged Care Assessment</div>
+          <div class="dc-desc">What the assessment involves and what happens next.</div>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
+        </div>
+        <div class="desktop-card" onclick="showSection('preparing')">
+          <div class="dc-title">Preparing for Assessment</div>
+          <div class="dc-desc">How to make the most of your assessment appointment.</div>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
+        </div>
+        <div class="desktop-card">
+          <div class="dc-title">Assessment Outcome — Now What?</div>
+          <div class="dc-desc">Approved, not approved, and finding a provider.</div>
+          <span class="dc-tag dc-tag-soon">Coming soon</span>
+        </div>
+        <div class="desktop-card">
+          <div class="dc-title">Support at Home</div>
+          <div class="dc-desc">The main home care program and how it works.</div>
+          <span class="dc-tag dc-tag-soon">Coming soon</span>
+        </div>
+        <div class="desktop-card" onclick="showSection('costsfees')">
+          <div class="dc-title">Costs and Fees</div>
+          <div class="dc-desc">How aged care fees work and where to find current figures.</div>
+          <span class="dc-tag dc-tag-review">Needs review</span>
+        </div>
+        <div class="desktop-card">
+          <div class="dc-title">Residential Aged Care</div>
+          <div class="dc-desc">When home is no longer the right option.</div>
+          <span class="dc-tag dc-tag-soon">Coming soon</span>
+        </div>
+        <div class="desktop-card">
+          <div class="dc-title">Managing in the System</div>
+          <div class="dc-desc">Providers, care managers, and making it work day to day.</div>
+          <span class="dc-tag dc-tag-soon">Coming soon</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="desktop-group">
+      <div class="desktop-group-label">Retirement Villages and Legal</div>
+      <div class="desktop-group-grid">
+        <div class="desktop-card">
+          <div class="dc-title">Retirement Villages and Over 55 Communities</div>
+          <div class="dc-desc">A different framework — what to know before you sign anything.</div>
+          <span class="dc-tag dc-tag-soon">Coming soon</span>
+        </div>
+        <div class="desktop-card">
+          <div class="dc-title">Legal and Documents</div>
+          <div class="dc-desc">Power of attorney, advance directives, and documents to have ready.</div>
+          <span class="dc-tag dc-tag-soon">Coming soon</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="state-section">
+    <div class="state-inner">
+      <div class="state-section-label" style="color: var(--sage); font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px;">Find information for your state or territory</div>
+      <p class="state-section-sub">Some services, contacts and rules vary depending on where you live. Select your state to see what applies to you.</p>
+      <div class="state-chips">
+        <div class="state-chip active">All states</div>
+        <div class="state-chip">NSW</div>
+        <div class="state-chip">VIC</div>
+        <div class="state-chip">QLD</div>
+        <div class="state-chip">WA</div>
+        <div class="state-chip">SA</div>
+        <div class="state-chip">TAS</div>
+        <div class="state-chip">ACT</div>
+        <div class="state-chip">NT</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="library-area">
+    <div class="library-inner">
+      <div class="library-eyebrow">Resource Library</div>
+      <div class="library-heading">Practical Tools and Resources</div>
+      <p class="library-sub">Checklists, guides and practical information — search or filter to find what you need.</p>
+      <div class="library-search">
+        <span class="library-search-icon">🔍</span>
+        <input type="text" placeholder="Search — try 'driving licence' or 'moving into care'">
+      </div>
+      <div class="library-chips">
+        <div class="lib-chip active">All</div>
+        <div class="lib-chip">Moving</div>
+        <div class="lib-chip">Legal</div>
+        <div class="lib-chip">Financial</div>
+        <div class="lib-chip">Safety</div>
+        <div class="lib-chip">Family</div>
+        <div class="lib-chip">Carer wellbeing</div>
+      </div>
+      <div class="library-cards">
+        <div class="lib-card">
+          <div class="lib-card-icon">🚗</div>
+          <div class="lib-card-title">Drivers Licence</div>
+          <div class="lib-card-type">Guide</div>
+        </div>
+        <div class="lib-card">
+          <div class="lib-card-icon">🏠</div>
+          <div class="lib-card-title">Moving out of the family home</div>
+          <div class="lib-card-type">Checklist</div>
+        </div>
+        <div class="lib-card">
+          <div class="lib-card-icon">📋</div>
+          <div class="lib-card-title">Power of Attorney — what you need to know</div>
+          <div class="lib-card-type">Guide</div>
+        </div>
+        <div class="lib-card">
+          <div class="lib-card-icon">🤝</div>
+          <div class="lib-card-title">Getting help to navigate the system</div>
+          <div class="lib-card-type">Contacts by state</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="footer-text">
+      Information only — not legal or financial advice.<br>
+      Content is reviewed regularly. Last updated June 2026.<br>
+      <a href="#">About this app</a> · <a href="#">Contact</a> · <a href="#">Feedback</a>
+    </p>
+  </footer>
+
+</div><!-- end home screen -->
+
+
+<!-- SECTION: THE BIG PICTURE -->
+<div id="screen-bigpicture" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="bigpicture" onclick="toggleFavourite('bigpicture', 'The Aged Care System', 'bigpicture', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    
+    <h1 class="section-page-title">The Aged Care System</h1>
+    <div class="reading-time">⏱ 8 minute read</div>
+
+    <div class="section-body">
+      <p>Australia's aged care system is not a single system. It is a patchwork of support delivered by three levels of government, as well as community organisations, charities and private providers. Understanding who does what is one of the most useful things you can know — because it helps you find the right door to knock on rather than getting lost between them.</p>
+
+      <h2>The Federal Government — the main aged care system</h2>
+
+      <p>The Australian Government funds and regulates the largest part of the aged care system. Almost all of the formal aged care programs most people are familiar with are federal — funded nationally and accessed through My Aged Care.</p>
+
+      <p>The main federal programs are:</p>
+
+      <strong>Commonwealth Home Support Programme</strong>
+      <p>Entry level support for older people who need a small amount of help to stay living at home. Things like cleaning, meals, transport, shopping and social activities. This program will transition into Support at Home no earlier than July 2027.</p>
+
+      <strong>Support at Home</strong>
+      <p>The main home care program for people with more complex needs at home. It replaced Home Care Packages in November 2025. Funding is provided quarterly across eight levels, from basic assistance through to high level care. Clinical care — nursing and allied health — is fully funded by the government regardless of financial situation.</p>
+
+      <strong>Residential Aged Care</strong>
+      <p>For people who can no longer safely live at home. The federal government subsidises residential care to make it accessible, and regulates providers to ensure quality and safety.</p>
+
+      <strong>Short-Term Pathways</strong>
+      <p>Including restorative care to help people regain function, assistive technology and home modifications funding, and an end of life pathway for people in their final months.</p>
+
+      <p>All federal programs are accessed through My Aged Care — either online at myagedcare.gov.au or by calling 1800 200 422.</p>
+
+      <h2>State and Territory Governments</h2>
+
+      <p>While the federal government funds the majority of aged care, state and territory governments play an important role — particularly in health and community services.</p>
+
+      <p>State and territory supports vary significantly depending on where you live, but typically include:</p>
+
+      <ul>
+        <li><strong>Public hospitals and rehabilitation</strong> — including hospital in the home programs and transition care after a hospital stay</li>
+        <li><strong>Community health services</strong> — nursing, allied health, wound care and chronic disease management in the community</li>
+        <li><strong>Mental health services</strong> — including support for older people experiencing depression, anxiety or dementia-related behavioural changes</li>
+        <li><strong>Transport concessions</strong> — subsidised public transport and taxi voucher schemes for eligible older people</li>
+        <li><strong>Housing support</strong> — some states fund modifications to help older people stay safely in their homes, or affordable housing options</li>
+        <li><strong>Carer support programs</strong> — some states fund respite and support services for people caring for older family members</li>
+      </ul>
+
+      <p>Because these vary by state, the state filter in this app will help you find what's available where you live.</p>
+
+      <h2>Local Councils</h2>
+
+      <p>Local councils are often the most overlooked and most accessible level of support — and in many cases the fastest to access. You don't need a formal assessment to use most council services, and they're often available quickly.</p>
+
+      <p>Council services commonly include:</p>
+
+      <ul>
+        <li><strong>Home maintenance and gardening</strong> — small jobs that help keep a home safe and liveable</li>
+        <li><strong>Community transport</strong> — to medical appointments, shopping and social activities</li>
+        <li><strong>Meals programs</strong> — home delivered meals or community dining programs</li>
+        <li><strong>Social and recreational programs</strong> — exercise classes, day programs, interest groups</li>
+        <li><strong>Information and referral</strong> — council aged care coordinators who can help you understand what's available locally</li>
+      </ul>
+
+      <p>The range of services varies considerably between councils. It's worth calling your local council directly and asking what aged care or seniors support services they offer — many people are surprised by what's available.</p>
+
+      <h2>Community Organisations and Charities</h2>
+
+      <p>A significant amount of support for older Australians is delivered by community organisations and charities — many of which have been doing this work for decades and are deeply embedded in local communities.</p>
+
+      <ul>
+        <li><strong>Meals on Wheels</strong> — delivered meals to people at home, often through local community organisations</li>
+        <li><strong>COTA Australia</strong> — the peak body for older Australians, with state-based offices providing information, advocacy and programs</li>
+        <li><strong>Carers Australia and Carer Gateway</strong> — support, counselling and practical assistance for people caring for older family members</li>
+        <li><strong>Dementia Australia</strong> — support, education and counselling for people living with dementia and their families</li>
+        <li><strong>Red Cross</strong> — social support programs including telephone friendship services and transport</li>
+        <li><strong>Uniting, Catholic Care, Anglicare and similar faith-based organisations</strong> — deliver a wide range of aged care services including home support and residential care</li>
+        <li><strong>Ethnic and cultural community organisations</strong> — many communities have their own organisations providing culturally appropriate support for older members</li>
+        <li><strong>Men's Shed</strong> — social connection and activity for older men, with hundreds of sheds across Australia</li>
+        <li><strong>Neighbourhood and community centres</strong> — social programs, classes and informal support networks</li>
+      </ul>
+
+      <p>Many of these organisations offer support regardless of whether someone is in the formal aged care system. They can be a first step, a complement to formal care, or simply a source of connection and community.</p>
+
+      <h2>The bottom line</h2>
+
+      <p>No single level of government or type of organisation covers everything. The best support for an individual is often a combination — federal programs for formal care needs, council services for practical day to day help, and community organisations for connection and informal support.</p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showHome()">
+        <span class="section-nav-label">← Back</span>
+        <span class="section-nav-title">All sections</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showSection('recognising')">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">Recognising When Help Is Needed</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- SECTION: RECOGNISING -->
+<div id="screen-recognising" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="recognising" onclick="toggleFavourite('recognising', 'Recognising When Help Is Needed', 'recognising', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    
+    <h1 class="section-page-title">Recognising When Help Is Needed</h1>
+    <div class="reading-time">⏱ 5 minute read</div>
+
+    <div class="section-body">
+      <p>Getting support starts with recognising that something has changed. That sounds simple, but for many people it's the hardest part — whether you're the one experiencing the changes or the one noticing them in someone you care about.</p>
+
+      <p>You're not as steady as you were. Something you've always done yourself now takes more effort, or doesn't get done at all. The garden is getting away from you. The bills feel harder to manage. You're not going out as much as you used to. You might put it down to a bad week, or tell yourself it will improve. Or you might feel the change quite clearly — and not quite know what to do about it, or who to tell.</p>
+
+      <p>Then there's the experience that's just as common — the person who notices things changing in someone they care about.</p>
+
+      <p>You've been visiting regularly. Things seem fine. Mum is a bit slower than she used to be, Dad forgets the odd thing — but that's just getting older, isn't it? Then something happens. A fall. A hospital visit. A neighbour calls. Suddenly it isn't fine. And you realise it probably hasn't been fine for a while.</p>
+
+      <p>Both of these experiences are real, and both matter. This section is for anyone who is noticing change — whether you're the one experiencing it or the one walking alongside someone you love.</p>
+
+      <p>The reality is that the system wasn't designed for urgency. Getting the right support in place takes time — often weeks or months, or even years. Starting that process before you desperately need it makes an enormous difference to what's available and how quickly you can access it.</p>
+
+      <h2>Talk to someone you trust</h2>
+
+      <p>The most important first step is often the simplest one — talking to someone. If you're the older person, that might be someone close to you, or your GP. If you're the one who has noticed something changing in someone you care about, it might be a gentle conversation with them directly. You don't need to have a plan. You just need to start the conversation.</p>
+
+      <h2>Talk to your GP</h2>
+
+      <p>Whatever your situation, a conversation with a GP is almost always the right first move. For the older person, a GP can assess what's changing, rule out things that are treatable, and help you understand your options. A GP you already know and trust is often the best person to talk to first.</p>
+
+      <h2>What to Look For</h2>
+
+      <p>The changes that matter are often subtle and easy to explain away. A few things to pay attention to when you visit:</p>
+
+      <strong>Around the home</strong>
+      <ul>
+        <li>Dishes piling up or the kitchen less clean than it used to be</li>
+        <li>Food in the fridge that's out of date or not being replaced</li>
+        <li>Mail piling up unopened</li>
+        <li>Bills that may not be getting paid</li>
+        <li>The garden or home maintenance being neglected when it used to matter to them</li>
+        <li>Unfamiliar dents or marks on the car</li>
+      </ul>
+
+      <strong>Personal care</strong>
+      <ul>
+        <li>Changes in hygiene or grooming that would have been unthinkable before</li>
+        <li>Wearing the same clothes repeatedly</li>
+        <li>Losing weight without trying to</li>
+        <li>Medications not being taken correctly — too many left, or running out too soon</li>
+      </ul>
+
+      <strong>Thinking and memory</strong>
+      <ul>
+        <li>Repeating the same stories or questions within a short time</li>
+        <li>Confusion about dates, appointments or recent events</li>
+        <li>Getting lost in familiar places</li>
+        <li>Difficulty managing finances — bills, banking, understanding statements</li>
+        <li>Being more easily confused or anxious than usual</li>
+      </ul>
+
+      <strong>Social and emotional</strong>
+      <ul>
+        <li>Withdrawing from activities or people they used to enjoy</li>
+        <li>Seeming flat, low or more tearful than normal</li>
+        <li>Increased anxiety, especially about being alone</li>
+        <li>Becoming more suspicious or easily upset</li>
+      </ul>
+
+      <strong>Physical</strong>
+      <ul>
+        <li>Moving more slowly or less steadily than before</li>
+        <li>Unexplained bruises that might indicate falls they haven't mentioned</li>
+        <li>Complaining of pain they are dismissing as nothing</li>
+        <li>Getting breathless doing things that used to be easy</li>
+      </ul>
+
+      <h2>One Thing to Know</h2>
+
+      <p>A single sign in isolation probably means nothing. A pattern of several things changing over time is worth taking seriously. And a sudden change — in thinking, behaviour or physical ability — is always worth a GP visit promptly.</p>
+
+      <div class="tips-box">
+        <div class="tips-box-header">
+          <span class="tips-box-icon">💡</span>
+          <span class="tips-box-title">Tips and Questions</span>
+        </div>
+        <h3>Tips</h3>
+        <ul>
+          <li>Keep a simple note on your phone of things you notice during visits — dates, what you observed, how it compared to last time. A pattern is much easier to see when it's written down.</li>
+          <li>Trust your instincts. If something feels different, it probably is.</li>
+          <li>Don't wait for a crisis. The earlier you start the conversation, the more options you have.</li>
+        </ul>
+        <h3>Questions to ask</h3>
+        <ul>
+          <li>Have I noticed this before, or is this new?</li>
+          <li>Is this a one-off bad day, or part of a pattern I've been explaining away?</li>
+          <li>If I described this to a GP, would I feel I was overreacting — or would I feel relieved someone knew?</li>
+          <li>What would I want someone to do if they noticed this in me?</li>
+        </ul>
+      </div>
+
+      <p>You don't need to have all the answers yet. At this stage you're just paying attention and starting a conversation. The formal process comes later — and we walk you through every step of it in the sections that follow.</p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showSection('bigpicture')">
+        <span class="section-nav-label">← Previous</span>
+        <span class="section-nav-title">The Aged Care System</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showHome()">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">Working Out What Help Is Needed</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: PERSON CENTRED CARE -->
+<div id="screen-personcentred" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="personcentred" onclick="toggleFavourite('personcentred', 'Person Centred Care — The Individual', 'personcentred', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">Person Centred Care — The Individual</h1>
+    <div class="reading-time">⏱ 3 minute read</div>
+
+    <div class="section-body">
+      <p>Person centred care is a term that is used in health care but its meaning is far broader than just the health system.</p>
+
+      <p>In the context of ageing, the focus should always be on the person — what they can do, what matters to them, and what they want their life to look like. Support works best when it's built around the individual's own aspirations and shaped to their unique circumstances.</p>
+
+      <p>Older people are experts in their own lives. They have navigated decades of decisions, relationships and challenges independently — and that doesn't change because they need some support. Person centred care recognises this. It starts from a position of respect.</p>
+
+      <p>That means involving the person in every decision that affects them. Not making decisions on their behalf, not assuming you know what's best, but genuinely seeking out what matters to them — their priorities, their preferences, their way of doing things. What feels like a small detail to a family member or a service provider can be enormously important to the person living that life.</p>
+
+      <p>The focus is always on what someone can do, not what they can't. Support fills the gaps — it doesn't replace capability. When help is designed around a person's strengths rather than their limitations, it preserves dignity and independence rather than eroding them.</p>
+
+      <p>Working in a person centred way means building trust, being honest, and making decisions together. Goals are set collaboratively. Plans reflect what the person actually wants, not just what the system offers. And when things change, the conversation starts again.</p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showHome()">
+        <span class="section-nav-label">← Back</span>
+        <span class="section-nav-title">All sections</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showSection('bigpicture')">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">The Aged Care System</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: WORKING OUT WHAT HELP IS NEEDED -->
+<div id="screen-workingout" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="workingout" onclick="toggleFavourite('workingout', 'Working Out What Help Is Needed', 'workingout', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">Working Out What Help Is Needed</h1>
+    <div class="reading-time">⏱ 4 minute read</div>
+
+    <div class="section-body">
+
+      <h2>What matters most</h2>
+
+      <p>Whether you're an older person thinking about your own needs, or someone trying to work out how best to support someone you care about, the starting point is the same — understanding what matters most to that person and what's becoming difficult.</p>
+
+      <p>Think about what the person values most. It might be staying in their own home. Keeping independence in specific areas. Maintaining a social life. Being able to see certain people. Continuing a hobby or routine. Staying connected to their community or faith.</p>
+
+      <p>Also think about what they are still able to do and where things have become more difficult. Being honest about both is the starting point for working out what kind of support would actually help.</p>
+
+      <p>It might help to think through a typical day or week:</p>
+
+      <strong>At home</strong>
+      <ul>
+        <li>The house may not be as clean or tidy as it once was</li>
+        <li>Meals, shopping or laundry might be getting harder to manage</li>
+        <li>Bills, banking or paperwork may be piling up or feel overwhelming</li>
+        <li>The garden or home maintenance might be getting away</li>
+        <li>The home itself may need a closer look — are there trip hazards, poor lighting, or places where a rail would help?</li>
+      </ul>
+
+      <strong>Personal care</strong>
+      <ul>
+        <li>Showering, dressing or grooming may have become more difficult or is happening less often</li>
+        <li>Medications may not always be taken correctly or on time</li>
+      </ul>
+
+      <strong>Getting around</strong>
+      <ul>
+        <li>Driving may be becoming harder, or getting to appointments and shops is more difficult than it used to be</li>
+        <li>Getting out of the house as often may no longer be easy</li>
+        <li>Stairs, uneven ground or walking longer distances may have become a real challenge</li>
+      </ul>
+
+      <h2>What help is wanted — and what isn't</h2>
+
+      <p>Not all help is welcome, and that's completely valid. Most people want support in specific areas while remaining independent in others. Being clear about this — to yourself and to anyone you speak to — makes it much easier to find support that actually fits.</p>
+
+      <p>It's also worth being honest about what would be accepted from a stranger in the home, versus what the person would prefer to manage themselves or with someone they know.</p>
+
+      <h2>Supports that already exist</h2>
+
+      <p>If there are people already providing help — formally or informally — it's worth thinking about what they're currently doing, how sustainable that is, and where the gaps are. Informal support from people who care is valuable, but it may have limits that need to be considered.</p>
+
+      <h2>Writing it down</h2>
+
+      <p>Before any assessment or conversation with a service, it helps enormously to have thought this through and written it down. Not a formal document — just a clear sense of what's needed, what matters, and what support would look like. The sections that follow will help you understand what's available and how to access it.</p>
+
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showSection('recognising')">
+        <span class="section-nav-label">← Previous</span>
+        <span class="section-nav-title">Recognising When Help Is Needed</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showHome()">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">Balancing Help and Independence</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: MY AGED CARE -->
+<div id="screen-myagedcare" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="myagedcare" onclick="toggleFavourite('myagedcare', 'My Aged Care', 'myagedcare', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">My Aged Care</h1>
+    <div class="reading-time">⏱ 5 minute read</div>
+
+    <div class="section-body">
+      <p>My Aged Care provides information, guidance and access to the Australian Government's subsidised aged care services, whether you need help at home, short-term respite care or permanent residential care.</p>
+
+      <p>You can access My Aged Care by phone on 1800 200 422, or online at myagedcare.gov.au. The phone line is available seven days a week.</p>
+
+      <h2>What programs does My Aged Care provide</h2>
+
+      <strong>Commonwealth Home Support Programme</strong>
+      <p>Entry level support for older people who need a small amount of help to stay living at home. Things like help with cleaning, meals, transport or social activities. This program is expected to transition into Support at Home no earlier than July 2027.</p>
+
+      <strong>Support at Home</strong>
+      <p>The main home care program for people with more complex needs. It replaced Home Care Packages in November 2025. Support is funded through a quarterly budget across eight levels of need, from basic assistance through to high level care at home.</p>
+
+      <strong>Residential Aged Care</strong>
+      <p>For people who can no longer safely live at home. My Aged Care manages the assessment and approval process for entry into residential care.</p>
+
+      <strong>Short-Term Care</strong>
+      <p>Programs including restorative care and transition care for people recovering from illness or hospital discharge.</p>
+
+      <h2>What My Aged Care doesn't cover</h2>
+
+      <p>It's worth knowing what isn't accessed through My Aged Care. State and territory funded services, local council programs, and private services all sit outside the My Aged Care system. You don't need to register with My Aged Care to access those — and for some types of support, they can be faster and easier to access than the federal system.</p>
+
+      <h2>A note on recent changes</h2>
+
+      <p>The aged care system changed significantly in late 2024 and 2025. The assessment process was replaced by the Single Assessment System in December 2024. Home Care Packages became Support at Home in November 2025. The new Aged Care Act also came into effect in November 2025, strengthening the rights of older people and the responsibilities of providers.</p>
+
+      <p>If you've been searching for information online and finding things that don't match what you're being told, it's likely the information is out of date. Everything in this app reflects how the system works now.</p>
+
+      <h2>How to get started</h2>
+
+      <p>Call 1800 200 422 or go to myagedcare.gov.au. You'll be asked some basic questions about the person needing support — their age, where they live, and what kind of help they're looking for. From there, My Aged Care will advise whether an assessment is needed and help arrange one.</p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showHome()">
+        <span class="section-nav-label">← Back</span>
+        <span class="section-nav-title">All sections</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showHome()">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">The Aged Care Assessment</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: WHAT HELP IS AVAILABLE -->
+<div id="screen-whathelp" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="whathelp" onclick="toggleFavourite('whathelp', 'What Help Is Available', 'whathelp', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">What Help Is Available</h1>
+    <div class="reading-time">⏱ 6 minute read</div>
+
+    <div class="section-body">
+      <p>Help is available from several different sources. The main provider of services for older people is the programs provided by the Australian Government but for many people the right support can also include services provided by state governments, local councils and other providers. Here is a list of the types of services available:</p>
+
+      <h2>My Aged Care</h2>
+
+      <p>The Australian Government funds the main formal aged care programs, all accessed through My Aged Care on 1800 200 422 or myagedcare.gov.au.</p>
+
+      <p>Services provided through these programs can include:</p>
+
+      <strong>Clinical support</strong>
+      <ul>
+        <li>Nursing — wound care, medication management, health monitoring</li>
+        <li>Physiotherapy — mobility, strength, falls prevention</li>
+        <li>Occupational therapy — home assessments, aids and equipment, maintaining daily function</li>
+        <li>Podiatry — foot care, nail care, diabetes-related foot health</li>
+        <li>Speech pathology — swallowing, communication</li>
+        <li>Dietitian or nutritionist — nutrition assessment and support</li>
+        <li>Social work — emotional support, care coordination, crisis support</li>
+      </ul>
+
+      <strong>Independence support</strong>
+      <ul>
+        <li>Personal care — help with showering, dressing, grooming, eating</li>
+        <li>Continence management support</li>
+        <li>Assistance with self-administration of medication</li>
+        <li>Social support and community engagement — individual and group social support, accompanied activities, digital education, assistance to maintain personal affairs</li>
+        <li>Therapeutic services — acupuncturist, chiropractor, diversional therapist, remedial massage, art therapy, osteopath</li>
+        <li>Respite care</li>
+        <li>Transport — group and individual assistance to connect older people with usual activities</li>
+        <li>Assistive technology and home modifications</li>
+      </ul>
+
+      <strong>Everyday living</strong>
+      <ul>
+        <li>Domestic assistance — general house cleaning, laundry services and shopping assistance</li>
+        <li>Home maintenance and repairs — essential light gardening, essential minor repairs</li>
+        <li>Meal preparation and meal delivery</li>
+      </ul>
+
+      <strong>Residential aged care</strong>
+      <ul>
+        <li>For people who can no longer safely live at home — the federal government subsidises the cost of residential care and regulates providers for quality and safety</li>
+      </ul>
+
+      <strong>Short-term care</strong>
+      <ul>
+        <li>Restorative care after illness or injury</li>
+        <li>Transition care after hospital</li>
+      </ul>
+
+      <h2>State and Territory Government</h2>
+
+      <p>State governments fund services that sit alongside the federal system — particularly health and community services. What's available varies significantly depending on where you live, but typically includes community health nursing, allied health, hospital in the home programs, mental health services, transport concessions, and some carer support programs.</p>
+
+      <p>The state filter in this app will show you what's available in your state or territory.</p>
+
+      <h2>Local Council</h2>
+
+      <p>Councils are often the fastest and easiest source of support — and the most overlooked. You usually don't need a formal assessment to access council services, and they can often start quickly.</p>
+
+      <p>Common council services include home maintenance and gardening, community transport to appointments and shops, meals programs, social and activity programs, and information and referral to other services.</p>
+
+      <p>It's worth calling your local council directly and asking what seniors or aged care support services they offer. Many people are surprised by what's there.</p>
+
+      <h2>Community Organisations and Charities</h2>
+
+      <p>A significant amount of support is delivered outside the government system entirely — by community organisations, charities and volunteer groups that have been supporting older Australians for decades.</p>
+
+      <p>This includes Meals on Wheels, Red Cross social support and transport programs, Dementia Australia, Carers Australia, COTA, faith-based organisations like Anglicare, Uniting and Catholic Care, ethnic and cultural community groups, Men's Shed, and local neighbourhood and community centres.</p>
+
+      <p>Many of these services are free or low cost and don't require a referral.</p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showHome()">
+        <span class="section-nav-label">← Back</span>
+        <span class="section-nav-title">All sections</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showHome()">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">Finding and Accessing Support</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: FINDING AND ACCESSING SUPPORT -->
+<div id="screen-findingaccessing" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="findingaccessing" onclick="toggleFavourite('findingaccessing', 'Finding and Accessing Support', 'findingaccessing', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">Finding and Accessing Support</h1>
+    <div class="reading-time">⏱ 5 minute read</div>
+
+    <div class="section-body">
+      <p>This section walks through how to find and access support across the system.</p>
+
+      <h2>Accessing My Aged Care</h2>
+
+      <p>My Aged Care is the front door to the Australian Government's aged care services. You can contact them in two ways.</p>
+
+      <p><em>By phone</em> — call 1800 200 422, Monday to Friday 8am to 8pm, and Saturday 10am to 2pm. Have some basic details ready, including the Medicare number of the person needing support.</p>
+
+      <p><em>Online</em> — go to myagedcare.gov.au and create an account. You can register, check eligibility, and manage assessments and services through the online portal.</p>
+
+      <p>When you make contact, you'll be asked some initial questions about the situation — what kind of help is needed, how urgent it is, and some basic personal details. From there, My Aged Care will advise whether a formal assessment is needed and help arrange one.</p>
+
+      <p>If English isn't the first language for the person needing support, My Aged Care has access to interpreter services — just let them know when you call.</p>
+
+      <p>If you're calling on behalf of someone else, you can do this, but at some point the older person will need to be involved directly, particularly for consent and for the assessment itself.</p>
+
+      <h2>Reaching out to state and territory government services</h2>
+
+      <p>Unlike My Aged Care, there is no single number or website for state and territory services — access varies depending on where you live and what kind of support you're looking for.</p>
+
+      <p>The best approach is usually to start with the specific service that is relevant — for example, contacting your local community health centre directly for nursing or allied health support, or your state health department's website for information on carer support programs or transport concessions.</p>
+
+      <p>The state filter in this app will help point you toward the right service and contact details for where you live.</p>
+
+      <h2>Reaching out to your local council</h2>
+
+      <p>Most councils have a dedicated aged or community services team, even if it isn't always advertised prominently. The simplest approach is to call your council's main number and ask to be connected with aged care, seniors, or community services.</p>
+
+      <p>It's worth asking specifically what's available — many councils don't proactively promote everything they offer, and services can vary considerably even between neighbouring council areas.</p>
+
+      <h2>Reaching out to community organisations and charities</h2>
+
+      <p>Community organisations and charities are generally the easiest to access — many don't require a referral or formal process at all. You can usually contact them directly by phone or through their website.</p>
+
+      <p>If you're not sure where to start, your GP, a hospital social worker, or your local council can often point you toward relevant organisations in your area.</p>
+
+      <h2>If you're not sure where to start</h2>
+
+      <p>If none of this feels clear, the simplest first step is usually a call to My Aged Care. Even if what's needed turns out to sit outside the federal system, they can often point you in the right direction.</p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showHome()">
+        <span class="section-nav-label">← Back</span>
+        <span class="section-nav-title">All sections</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showSection('myagedcare')">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">My Aged Care</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: BALANCING HELP AND INDEPENDENCE -->
+<div id="screen-balancing" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="balancing" onclick="toggleFavourite('balancing', 'Balancing Help and Independence', 'balancing', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">Balancing Help and Independence</h1>
+    <div class="reading-time">⏱ 3 minute read</div>
+
+    <div class="section-body">
+      <h2>The risk of doing too much too soon</h2>
+
+      <p>Well-meaning help can have an unintended cost. When family members or services step in too quickly or too completely, it can accelerate dependence and erode confidence. Maintaining independence — doing what you can, the way you can do it — is good for both mental and physical health, and that's worth protecting wherever possible.</p>
+
+      <p>If a task takes more time or a different approach than it used to, that's not necessarily a problem. It's just a different way of doing things.</p>
+
+      <p>This doesn't mean withholding help. It means being thoughtful about how much, how often, and in what way.</p>
+
+      <h2>Practical ways to support without taking over</h2>
+
+      <p>The aim is to fill gaps, not replace capability. A few ways this plays out in practice:</p>
+
+      <ul>
+        <li>Offering help rather than doing things automatically — asking first, even when the answer seems obvious</li>
+        <li>Supporting someone to do a task themselves where possible, rather than doing it for them</li>
+        <li>Involving the person in decisions about their own care, even when it would be quicker not to</li>
+        <li>Being willing to let some things go — a task done differently, or not perfectly, isn't necessarily a problem</li>
+        <li>Checking in regularly rather than assuming a single conversation settles things for good</li>
+      </ul>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showSection('workingout')">
+        <span class="section-nav-label">← Previous</span>
+        <span class="section-nav-title">Working Out What Help Is Needed</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showSection('whathelp')">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">What Help Is Available</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- JOURNEY: JUST STARTING -->
+<div id="screen-juststarting" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="juststarting" onclick="toggleFavourite('juststarting', 'I\'m Just Starting to Think About This', 'juststarting', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">I'm Just Starting to Think About This</h1>
+    <div class="reading-time">⏱ 2 minute read</div>
+
+    <div class="section-body">
+      <p>Planning ahead is one of the most valuable things you can do. The aged care system takes time to navigate — accessing government funded programs can take many months, and sometimes years — and when support is needed urgently, that time pressure makes everything harder. People who have read through the information, had some early conversations, and understood what's available are in a much stronger position.</p>
+
+      <p>You don't need to do anything formal right now. There's no form to fill in, no number to call, no decision to make today. Just reading through this app at your own pace will give you a solid understanding of how the system works, what's available, and what's worth thinking about.</p>
+
+      <p>It's worthwhile thinking through what might be needed over the next year, and the year after that. My Aged Care offers different levels of support depending on need — from a small amount of help around the home through to more substantial care. Having things set up with My Aged Care before you reach "we need help now" can make all the difference between waiting in a crisis and already having some level of support in place.</p>
+
+      <h2>Where to start reading in this app</h2>
+
+      <p>A good place to begin is <strong style="display:inline; margin:0; font-size:1.05rem;">Person Centred Care — The Individual</strong>, which sets out the thinking behind everything else in this app. From there, <strong style="display:inline; margin:0; font-size:1.05rem;">The Aged Care System</strong> explains how the different levels of government and community support fit together.</p>
+
+      <p>When you're ready, <strong style="display:inline; margin:0; font-size:1.05rem;">Recognising When Help Is Needed</strong> and <strong style="display:inline; margin:0; font-size:1.05rem;">Working Out What Help Is Needed</strong> will help you think through what to watch for and what matters most — for yourself, or for someone you care about.</p>
+
+      <p>There's no right order, and no rush. Come back to this app whenever you want to pick up where you left off.</p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showHome()">
+        <span class="section-nav-label">← Back</span>
+        <span class="section-nav-title">All sections</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showSection('personcentred')">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">Person Centred Care — The Individual</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: THE AGED CARE ASSESSMENT -->
+<div id="screen-assessment" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="assessment" onclick="toggleFavourite('assessment', 'The Aged Care Assessment', 'assessment', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">The Aged Care Assessment</h1>
+    <div class="reading-time">⏱ 5 minute read</div>
+
+    <div class="section-body">
+      <p>Before anyone can access Australian Government subsidised aged care services, they need to apply for and complete an aged care assessment. This is a mandatory first step — there is no way to access Australian Government subsidised home support, home care, or residential care without one.</p>
+
+      <p>The process evaluates your care needs — whether for in-home support or a residential care placement through programs such as the Commonwealth Home Support Programme, Support at Home, or residential aged care.</p>
+
+      <h2>How the assessment process works</h2>
+
+      <p>You can request an assessment by calling My Aged Care on 1800 200 422 or applying online at myagedcare.gov.au.</p>
+
+      <p>From there, the process generally follows these steps:</p>
+
+      <ol style="margin: 10px 0 24px 24px; line-height: 2.1; color: var(--charcoal); font-size: 1.05rem; font-weight: 400;">
+        <li><strong style="display:inline; margin:0; font-size:1.05rem;">Referral</strong> — My Aged Care registers the request and refers it to a local assessment organisation</li>
+        <li><strong style="display:inline; margin:0; font-size:1.05rem;">Triage call</strong> — a Triage Delegate contacts you, usually within two weeks, to confirm what kind of assessment is needed</li>
+        <li><strong style="display:inline; margin:0; font-size:1.05rem;">The assessment itself</strong> — a trained assessor meets with the person needing support, either at home or in hospital if relevant. The assessment uses a standard national tool called the Integrated Assessment Tool (IAT), which looks at health, daily living, safety, existing supports, and what matters most to the person</li>
+        <li><strong style="display:inline; margin:0; font-size:1.05rem;">Outcome</strong> — you receive a written outcome, often called a Notice of Decision, along with a support plan setting out next steps</li>
+      </ol>
+
+      <p>Because there's now a single pathway, you generally won't need a completely new assessment if your needs change or you move between different types of care — the system is designed to follow you.</p>
+
+      <h2>What the assessment looks at</h2>
+
+      <p>The assessment isn't just a checklist of medical needs. It's designed to understand the whole picture — physical health, cognitive and emotional wellbeing, safety in the home, existing informal support, and the person's own goals and preferences. This is also why preparing for the assessment in advance — covered in the next section — makes such a difference to the outcome.</p>
+
+      <h2>A note on timing</h2>
+
+      <p>Wait times have historically been a significant source of frustration in this system. The government's stated target is to reduce the time between referral and funding allocation to around three months by July 2027 — which gives a sense of how long the process can currently take, and why starting early matters.</p>
+
+      <p style="font-size: 0.85rem; color: var(--mid-grey); margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--light-grey);"><em>Source: Australian Government Department of Health, Disability and Ageing — health.gov.au/our-work/single-assessment-system</em></p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showSection('myagedcare')">
+        <span class="section-nav-label">← Previous</span>
+        <span class="section-nav-title">My Aged Care</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showHome()">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">Preparing for Assessment</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- FAVOURITES SCREEN -->
+<div id="screen-favourites" class="screen">
+  <nav>
+    <div class="nav-logo" onclick="showHome()">Ageing <strong>Navigator</strong></div>
+  </nav>
+  <div class="section-page-content" style="padding-top: 32px;">
+    <h1 class="section-page-title" style="font-size: 1.6rem;">My Favourites</h1>
+    <p style="font-size: 0.9rem; color: var(--mid-grey); margin-bottom: 24px;">Pages and resources you've saved for later.</p>
+    <div id="favourites-list" class="sections-list"></div>
+    <div id="favourites-empty" class="fav-empty" style="display: none;">
+      <div class="fav-empty-icon">☆</div>
+      <div class="fav-empty-title">No favourites yet</div>
+      <div class="fav-empty-text">Tap the star on any page or resource to save it here for quick access later.</div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAVIGATION -->
+<div class="bottom-nav">
+  <button class="bottom-nav-btn active" id="navbtn-home" onclick="bottomNavGo('home')">
+    <span class="bottom-nav-icon">🏠</span>
+    <span class="bottom-nav-label">Home</span>
+  </button>
+  <button class="bottom-nav-btn" id="navbtn-search" onclick="bottomNavGo('search')">
+    <span class="bottom-nav-icon">🔍</span>
+    <span class="bottom-nav-label">Search</span>
+  </button>
+  <button class="bottom-nav-btn" id="navbtn-favourites" onclick="bottomNavGo('favourites')">
+    <span class="bottom-nav-icon">☆</span>
+    <span class="bottom-nav-label">Favourites</span>
+    <span class="bottom-nav-badge" id="fav-badge" style="display:none;">0</span>
+  </button>
+</div>
+
+<!-- SECTION: COSTS AND FEES -->
+<div id="screen-costsfees" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="costsfees" onclick="toggleFavourite('costsfees', 'Costs and Fees', 'costsfees', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">Costs and Fees</h1>
+    <div class="reading-time">⏱ 5 minute read</div>
+
+    <div style="background: var(--amber-light); border: 1.5px solid var(--amber); border-radius: 10px; padding: 16px 18px; margin-bottom: 28px;">
+      <div style="font-weight: 700; color: var(--amber); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">Placeholder — needs verification before publishing</div>
+      <p style="font-size: 0.88rem; color: var(--charcoal); line-height: 1.55; margin: 0;">The structure below is drafted, but every detail needs to be checked against current Australian Government sources before this goes live — including URLs, fee categories and exactly how means testing is described. Cost information is high stakes if it's wrong.</p>
+    </div>
+
+    <div class="section-body">
+      <p>Cost is one of the first questions most families ask, and one of the hardest to get a straight answer to. Aged care fees in Australia depend on the type of care, your income and assets, and which arrangements apply to your situation — which means there's no single number that applies to everyone.</p>
+
+      <h2>Why specific figures aren't included here</h2>
+
+      <p>Aged care fees are reviewed and updated twice a year, on 20 March and 20 September. A dollar figure that's accurate today may be out of date within months. Rather than risk giving you information that's wrong by the time you read it, this section explains how the fee structure works, and points you to the official government sources that are kept current. Getting this right matters — a family making decisions based on an outdated figure could be seriously misled, and that's a risk worth avoiding altogether.</p>
+
+      <h2>Support at Home — how fees work</h2>
+
+      <p>There is no flat daily fee under Support at Home. Instead, you contribute a percentage of the cost of each service you receive, with different categories of service carrying different contribution rates.</p>
+
+      <p>Your contribution rate depends on an income and assets assessment carried out by Services Australia. Full pensioners generally pay the lowest rates, and self-funded retirees pay the highest. You can access Support at Home without completing this assessment, but you may be charged at the maximum rate until you do.</p>
+
+      <h2>Residential aged care — how fees work</h2>
+
+      <p>Residential care has a more layered fee structure:</p>
+
+      <ul>
+        <li><strong>Basic daily fee</strong> — a standard fee that every resident pays, covering everyday living costs like meals, cleaning and laundry, regardless of income or assets</li>
+        <li><strong>Means-tested care fee</strong> — an additional contribution some residents pay toward the cost of their personal and clinical care, based on an income and assets assessment, with annual and lifetime caps so the total you pay is limited over time</li>
+        <li><strong>Accommodation costs</strong> — a separate payment for your room, either as a lump sum (Refundable Accommodation Deposit) or as an ongoing daily payment, depending on your circumstances and the facility you choose</li>
+      </ul>
+
+      <h2>Where to find accurate, current figures</h2>
+
+      <p>For the most accurate and up-to-date information for your situation:</p>
+
+      <ul>
+        <li><strong>Support at Home fee estimator</strong> — myagedcare.gov.au/support-at-home-fee-estimator — to estimate your contribution toward home care services</li>
+        <li><strong>Aged care home costs and fees</strong> — myagedcare.gov.au/aged-care-home-costs-and-fees — to understand the different fee types for residential care</li>
+        <li><strong>Aged care home fee estimator</strong> — myagedcare.gov.au/aged-care-home-fee-estimator — to calculate what you might pay in a residential aged care home</li>
+        <li><strong>Services Australia</strong> — servicesaustralia.gov.au — to complete your formal means assessment and get your actual fee advice</li>
+      </ul>
+
+      <p>These tools ask about your income, assets and circumstances and give you a personalised estimate — which is the only reliable way to know what you'll actually pay.</p>
+
+      <h2>A note on the family home</h2>
+
+      <p>The family home is treated differently to other assets in means testing, and the rules around this are a common source of confusion. If this applies to your situation, it's worth checking the current rules directly with Services Australia before making any decisions.</p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showHome()">
+        <span class="section-nav-label">← Back</span>
+        <span class="section-nav-title">All sections</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: PREPARING FOR ASSESSMENT -->
+<div id="screen-preparing" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="preparing" onclick="toggleFavourite('preparing', 'Preparing for Assessment', 'preparing', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">Preparing for Assessment</h1>
+    <div class="reading-time">⏱ 5 minute read</div>
+
+    <div class="section-body">
+      <p>Think about your goals, needs, wishes and preferences in advance. The assessor is there to understand the whole person, not just to tick boxes — so the more clearly you can articulate what matters and what's becoming difficult, the better.</p>
+
+      <h2>What to have ready</h2>
+
+      <p>Before the assessment, gather the following:</p>
+
+      <ul>
+        <li><strong>Medicare card</strong> — the assessor will need this to verify identity and access your My Aged Care record</li>
+        <li><strong>A list of current medications</strong> — including doses and who prescribed them</li>
+        <li><strong>Details of your GP and any specialists</strong> — names and contact details</li>
+        <li><strong>A summary of current health conditions</strong> — diagnoses, recent hospital visits, any pending referrals</li>
+        <li><strong>Details of support already in place</strong> — who is currently helping, how often, and with what</li>
+        <li><strong>Any relevant documents</strong> — hospital discharge summaries, specialist letters, or previous assessment records if you have them</li>
+      </ul>
+
+      <h2>What the assessor will want to know</h2>
+
+      <p>The assessor will use a standard national tool called the Integrated Assessment Tool (IAT) to guide the conversation. They'll be looking at:</p>
+
+      <ul>
+        <li>What daily tasks you can manage independently and where you need help</li>
+        <li>Your physical health, cognitive wellbeing and emotional state</li>
+        <li>How safe your home environment is</li>
+        <li>Who is currently supporting you and how sustainable that is</li>
+        <li>What matters most to you — your goals, preferences and what you want your life to look like</li>
+      </ul>
+
+      <p>This isn't an interrogation — it's a conversation. The assessor is trying to understand your situation as fully as possible so the outcome reflects your real needs.</p>
+
+      <h2>Who to bring</h2>
+
+      <p>You can have someone with you at the assessment — a trusted person, a family member, or an advocate. Having someone present can help if you find it hard to describe everything yourself, or if you want someone to take notes. If the person being assessed has dementia or cognitive difficulties, having someone present who knows them well is particularly valuable.</p>
+
+      <p>If you'd like an independent advocate — someone who is not a family member and has no conflict of interest — you can request one through the National Aged Care Advocacy Program (NACAP) free of charge.</p>
+
+      <h2>A note on wait times</h2>
+
+      <p>The national median wait time from referral to assessment was 25 days as at March 2026, though some people wait longer. Once assessed and approved for Support at Home, you are placed in the national allocation queue, with priority determined by urgency and the date of your approval — and wait times for higher levels of support can involve waits of many months. This is why starting the process early — before a crisis — makes such a difference.</p>
+
+      <h2>If your situation is urgent</h2>
+
+      <p>Financial hardship, urgency, or carer breakdown can all be flagged to prioritise the assessment process. Make sure to tell My Aged Care clearly when you call if any of these apply.</p>
+
+      <div class="tips-box">
+        <div class="tips-box-header">
+          <span class="tips-box-icon">💡</span>
+          <span class="tips-box-title">Tips and Questions</span>
+        </div>
+        <h3>Tips</h3>
+        <ul>
+          <li>Write things down before the assessment, not on the day — it's easy to forget important details when you're in the moment</li>
+          <li>Don't minimise. Assessors see many people and are experienced at understanding need — describe your worst days, not just your best</li>
+          <li>If you're supporting someone during the assessment, ask them in advance what they want you to say and what they'd prefer to keep private</li>
+          <li>Ask for a copy of the support plan after the assessment so you have a record of what was found and recommended</li>
+        </ul>
+        <h3>Questions to ask the assessor</h3>
+        <ul>
+          <li>What level of support am I likely to be eligible for based on what you've seen today?</li>
+          <li>How long is the wait likely to be from here?</li>
+          <li>Is there anything I can access while I'm waiting for my package to be allocated?</li>
+          <li>What happens if my situation changes before I'm allocated support?</li>
+          <li>How do I appeal if I disagree with the outcome?</li>
+        </ul>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--mid-grey); margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--light-grey);"><em>Source: myagedcare.gov.au/preparing-your-assessment</em></p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showSection('assessment')">
+        <span class="section-nav-label">← Previous</span>
+        <span class="section-nav-title">The Aged Care Assessment</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showHome()">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">Assessment Outcome — Now What?</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- DESKTOP / MOBILE LAYOUT SWITCHING ----------
+  function applyLayout() {
+    const isDesktop = window.innerWidth >= 1024;
+    const desktopFeatured = document.querySelector('.desktop-featured');
+    const desktopSections = document.querySelector('.desktop-sections-area');
+    const mobileWrapper = document.querySelector('.home-desktop-wrapper');
+    const mobileOrigSections = document.querySelector('.sections-area:not(.desktop-sections-area)');
+    const heroLeft = document.querySelector('.hero-left');
+    const heroRight = document.querySelector('.hero-right');
+
+    const mobileHeroSub = document.querySelector('.hero > .hero-sub');
+
+    if (isDesktop) {
+      if (desktopFeatured) desktopFeatured.style.display = 'flex';
+      if (desktopSections) desktopSections.style.display = 'block';
+      if (mobileWrapper) mobileWrapper.style.display = 'none';
+      if (mobileOrigSections) mobileOrigSections.style.display = 'none';
+      if (heroLeft) heroLeft.style.display = 'flex';
+      if (heroRight) heroRight.style.display = 'flex';
+      if (mobileHeroSub) mobileHeroSub.style.display = 'none';
+    } else {
+      if (desktopFeatured) desktopFeatured.style.display = 'none';
+      if (desktopSections) desktopSections.style.display = 'none';
+      if (mobileWrapper) mobileWrapper.style.display = 'block';
+      if (mobileOrigSections) mobileOrigSections.style.display = 'block';
+      if (heroLeft) heroLeft.style.display = 'none';
+      if (heroRight) heroRight.style.display = 'none';
+      if (mobileHeroSub) mobileHeroSub.style.display = 'block';
+    }
+  }
+
+  window.addEventListener('resize', applyLayout);
+  applyLayout();
+
+  // ---------- DESKTOP SIDEBAR ----------
+  const SECTIONS = [
+    { id: 'personcentred', title: 'Person Centred Care', drafted: true },
+    { id: 'bigpicture', title: 'The Aged Care System', drafted: true },
+    { id: 'recognising', title: 'Recognising When Help Is Needed', drafted: true },
+    { id: 'workingout', title: 'Working Out What Help Is Needed', drafted: true },
+    { id: 'balancing', title: 'Balancing Help and Independence', drafted: true },
+    { id: 'whathelp', title: 'What Help Is Available', drafted: true },
+    { id: 'findingaccessing', title: 'Finding and Accessing Support', drafted: true },
+    { id: 'myagedcare', title: 'My Aged Care', drafted: true },
+    { id: 'assessment', title: 'The Aged Care Assessment', drafted: true },
+    { id: 'preparing', title: 'Preparing for Assessment', drafted: true },
+    { id: 'screen-outcome', title: 'Assessment Outcome — Now What?', drafted: false },
+    { id: 'supportathome', title: 'Support at Home', drafted: false },
+    { id: 'retirementvillages', title: 'Retirement Villages', drafted: false },
+    { id: 'residentialcare', title: 'Residential Aged Care', drafted: false },
+    { id: 'managing', title: 'Managing in the System', drafted: false },
+    { id: 'costsfees', title: 'Costs and Fees', drafted: true },
+    { id: 'legal', title: 'Legal and Documents', drafted: false },
+  ];
+
+  function buildDesktopSidebar(activeId) {
+    if (window.innerWidth < 1024) return '';
+    return `<div class="desktop-section-sidebar">
+      <div class="desktop-section-sidebar-label">All sections</div>
+      ${SECTIONS.map(s => `
+        <div class="desktop-sidebar-item ${s.id === activeId ? 'active' : ''} ${s.drafted ? 'drafted' : ''}" onclick="showSection('${s.id}')">
+          <span class="sidebar-dot"></span>${s.title}
+        </div>`).join('')}
+    </div>`;
+  }
+
+  function wrapSectionWithSidebar(screenEl, id) {
+    if (window.innerWidth < 1024) return;
+    const existing = screenEl.querySelector('.desktop-section-wrapper');
+    if (existing) {
+      existing.querySelector('.desktop-section-sidebar').innerHTML = `
+        <div class="desktop-section-sidebar-label">All sections</div>
+        ${SECTIONS.map(s => `
+          <div class="desktop-sidebar-item ${s.id === id ? 'active' : ''} ${s.drafted ? 'drafted' : ''}" onclick="showSection('${s.id}')">
+            <span class="sidebar-dot"></span>${s.title}
+          </div>`).join('')}
+      `;
+      return;
+    }
+    const content = screenEl.querySelector('.section-page-content');
+    if (!content) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'desktop-section-wrapper';
+    const sidebar = document.createElement('div');
+    sidebar.className = 'desktop-section-sidebar';
+    sidebar.innerHTML = `
+      <div class="desktop-section-sidebar-label">All sections</div>
+      ${SECTIONS.map(s => `
+        <div class="desktop-sidebar-item ${s.id === id ? 'active' : ''} ${s.drafted ? 'drafted' : ''}" onclick="showSection('${s.id}')">
+          <span class="sidebar-dot"></span>${s.title}
+        </div>`).join('')}
+    `;
+    const contentWrapper = document.createElement('div');
+    contentWrapper.className = 'desktop-section-content';
+    contentWrapper.innerHTML = content.innerHTML;
+    wrapper.appendChild(sidebar);
+    wrapper.appendChild(contentWrapper);
+    content.replaceWith(wrapper);
+  }
+
+  // Override showSection to add sidebar on desktop
+  const _origShowSection = showSection;
+  function showSection(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById('screen-' + id);
+    if (el) {
+      el.classList.add('active');
+      wrapSectionWithSidebar(el, id);
+    }
+    window.scrollTo(0, 0);
+    setActiveNav(null);
+  }
+  let favourites = {};
+
+  function favKey(id) { return id; }
+
+  function isFavourite(id) {
+    return !!favourites[id];
+  }
+
+  function toggleFavourite(id, title, target, event) {
+    if (event) event.stopPropagation();
+    if (favourites[id]) {
+      delete favourites[id];
+    } else {
+      favourites[id] = { title: title, target: target };
+    }
+    renderFavouriteButtons();
+    renderFavouritesScreen();
+    updateFavBadge();
+  }
+
+  function renderFavouriteButtons() {
+    document.querySelectorAll('.fav-btn').forEach(btn => {
+      const id = btn.getAttribute('data-fav-id');
+      if (isFavourite(id)) {
+        btn.classList.add('is-fav');
+        btn.textContent = '★';
+      } else {
+        btn.classList.remove('is-fav');
+        btn.textContent = '☆';
+      }
+    });
+
+    document.querySelectorAll('.page-fav-btn').forEach(btn => {
+      const id = btn.getAttribute('data-fav-id');
+      const icon = btn.querySelector('.page-fav-icon');
+      const label = btn.querySelector('.page-fav-label');
+      if (isFavourite(id)) {
+        btn.classList.add('is-fav');
+        if (icon) icon.textContent = '★';
+        if (label) label.textContent = 'Saved';
+      } else {
+        btn.classList.remove('is-fav');
+        if (icon) icon.textContent = '☆';
+        if (label) label.textContent = 'Save';
+      }
+    });
+  }
+
+  function updateFavBadge() {
+    const count = Object.keys(favourites).length;
+    const badge = document.getElementById('fav-badge');
+    if (count > 0) {
+      badge.style.display = 'flex';
+      badge.textContent = count;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function renderFavouritesScreen() {
+    const list = document.getElementById('favourites-list');
+    const empty = document.getElementById('favourites-empty');
+    const ids = Object.keys(favourites);
+
+    if (ids.length === 0) {
+      list.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+
+    list.style.display = 'flex';
+    empty.style.display = 'none';
+    list.innerHTML = ids.map(id => {
+      const item = favourites[id];
+      return `<div class="section-row" onclick="showSection('${item.target}')">
+        <span class="section-title">${item.title}</span>
+        <button class="fav-btn is-fav" data-fav-id="${id}" onclick="toggleFavourite('${id}', '${item.title.replace(/'/g, "\\'")}', '${item.target}', event)">★</button>
+        <span class="section-chevron">Read →</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ---------- NAVIGATION ----------
+  function showHome() {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-home').classList.add('active');
+    window.scrollTo(0, 0);
+    setActiveNav('home');
+    applyLayout();
+  }
+
+  function showSection(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    window.scrollTo(0, 0);
+    setActiveNav(null);
+  }
+
+  function setActiveNav(which) {
+    document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+    if (which) {
+      const btn = document.getElementById('navbtn-' + which);
+      if (btn) btn.classList.add('active');
+    }
+  }
+
+  function bottomNavGo(which) {
+    if (which === 'home') {
+      showHome();
+    } else if (which === 'favourites') {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-favourites').classList.add('active');
+      window.scrollTo(0, 0);
+      setActiveNav('favourites');
+      renderFavouritesScreen();
+    } else if (which === 'search') {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-home').classList.add('active');
+      window.scrollTo(0, 0);
+      setActiveNav('search');
+      const input = document.querySelector('.library-search input');
+      if (input) {
+        document.querySelector('.library-area').scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => input.focus(), 400);
+      }
+    }
+  }
+
+  document.querySelectorAll('.state-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('.state-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.lib-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('.lib-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  renderFavouriteButtons();
+  updateFavBadge();
+</script>
+
+</body>
+</html>
