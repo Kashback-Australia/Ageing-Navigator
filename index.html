@@ -1173,8 +1173,10 @@
         <button class="fav-btn" data-fav-id="preparing" onclick="toggleFavourite('preparing', 'Preparing for Assessment', 'preparing', event)">☆</button>
         <span class="section-chevron">Read →</span>
       </div>
-      <div class="section-row">
+      <div class="section-row" onclick="showSection('outcome')">
         <span class="section-title">Assessment Outcome — Now What?</span>
+        <span class="section-tag tag-draft">Draft ready</span>
+        <button class="fav-btn" data-fav-id="outcome" onclick="toggleFavourite('outcome', 'Assessment Outcome — Now What?', 'outcome', event)">☆</button>
         <span class="section-chevron">Read →</span>
       </div>
 
@@ -1298,10 +1300,10 @@
           <div class="dc-desc">How to make the most of your assessment appointment.</div>
           <span class="dc-tag dc-tag-draft">Draft ready</span>
         </div>
-        <div class="desktop-card">
+        <div class="desktop-card" onclick="showSection('outcome')">
           <div class="dc-title">Assessment Outcome — Now What?</div>
           <div class="dc-desc">Approved, not approved, and finding a provider.</div>
-          <span class="dc-tag dc-tag-soon">Coming soon</span>
+          <span class="dc-tag dc-tag-draft">Draft ready</span>
         </div>
         <div class="desktop-card">
           <div class="dc-title">Support at Home</div>
@@ -1430,6 +1432,8 @@
 
     <div class="section-body">
       <p>Australia's aged care system is not a single system. It is a patchwork of support delivered by three levels of government, as well as community organisations, charities and private providers. Understanding who does what is one of the most useful things you can know — because it helps you find the right door to knock on rather than getting lost between them.</p>
+
+      <p>Navigating the aged care system can feel overwhelming. There are places to go and services available to help — see the <strong><a href="#" onclick="showSection('findingaccessing'); return false;" style="color: var(--sage);">Finding and Accessing Support</a></strong> section for details.</p>
 
       <h2>The Federal Government — the main aged care system</h2>
 
@@ -1922,6 +1926,10 @@
     <div class="section-body">
       <p>This section walks through how to find and access support across the system.</p>
 
+      <h2>Getting help to navigate the system</h2>
+
+      <p>If you need help understanding the aged care system, supports or services, there are several places to turn.</p>
+
       <h2>Accessing My Aged Care</h2>
 
       <p>My Aged Care is the front door to the Australian Government's aged care services. You can contact them in two ways.</p>
@@ -1935,6 +1943,12 @@
       <p>If English isn't the first language for the person needing support, My Aged Care has access to interpreter services — just let them know when you call.</p>
 
       <p>If you're calling on behalf of someone else, you can do this, but at some point the older person will need to be involved directly, particularly for consent and for the assessment itself.</p>
+
+      <h2>Australia's Care Finder Program</h2>
+
+      <p>The Care Finder Program provides face-to-face services to help older people navigate the aged care system, particularly those who have no carer or trusted support person to assist them, or who may need more intensive support. This service is available through Primary Health Networks located in every state and territory across Australia.</p>
+
+      <p>👉 <a href="https://thephn.com.au/" target="_blank" style="color: var(--sage); font-weight: 500;">Primary Health Networks — thephn.com.au</a> or call 1300 859 028</p>
 
       <h2>Reaching out to state and territory government services</h2>
 
@@ -2292,7 +2306,7 @@
         </ul>
       </div>
 
-      <p style="font-size: 0.85rem; color: var(--mid-grey); margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--light-grey);"><em>Source: myagedcare.gov.au/preparing-your-assessment</em></p>
+      <p style="font-size: 0.85rem; color: var(--mid-grey); margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--light-grey);"><em>👉 Source: <a href="https://www.health.gov.au/our-work/single-assessment-system" target="_blank" style="color: var(--sage);">health.gov.au/our-work/single-assessment-system</a></em></p>
     </div>
 
     <div class="section-nav-footer">
@@ -2303,6 +2317,127 @@
       <button class="section-nav-btn next" onclick="showHome()">
         <span class="section-nav-label">Next →</span>
         <span class="section-nav-title">Assessment Outcome — Now What?</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: ASSESSMENT OUTCOME -->
+<div id="screen-outcome" class="screen">
+  <nav class="section-page-nav">
+    <button class="nav-back" onclick="showHome()">← Back</button>
+    <button class="page-fav-btn" data-fav-id="outcome" onclick="toggleFavourite('outcome', 'Assessment Outcome — Now What?', 'outcome', event)"><span class="page-fav-icon">☆</span><span class="page-fav-label">Save</span></button>
+  </nav>
+
+  <div class="section-page-content">
+    <h1 class="section-page-title">Assessment Outcome — Now What?</h1>
+    <div class="reading-time">⏱ 8 minute read</div>
+
+    <div class="section-body">
+      <p>After your assessment you will receive a Notice of Decision letter telling you whether you are eligible for government-subsidised services.</p>
+
+      <p>If the letter tells you that you are eligible, it will include information about the services you are approved to receive, the reasons for the assessment outcome, what to do if you don't agree with the decision, and a support plan with the referral codes you need to access services.</p>
+
+      <p>If the letter tells you that you are not eligible, it will explain why. You can discuss the outcome with the assessment organisation using the contact details on the letter. You can also request an internal review of the decision by the Department of Health, Disability and Ageing — see the My Aged Care website for how to do this. You have 28 days from the date of receiving your Notice of Decision to ask for an internal review.</p>
+
+      <h2>If you are eligible — next steps</h2>
+
+      <h2>Commonwealth Home Support Programme</h2>
+
+      <p>The Commonwealth Home Support Programme is the entry level support program providing a small amount of help to stay living at home. Your Notice of Decision and support plan will tell you what services you are eligible to receive. The next step is to find a provider that can deliver the services you need.</p>
+
+      <p>Services under this program are subsidised by the Australian Government. If you are eligible, you will pay a contribution fee toward the cost of services if you can afford to do so. If you don't think you can afford the contribution fee, discuss this with providers when you contact them.</p>
+
+      <p>If you have agreed with your assessor, they may have already let providers know you are looking for services. You can also look for providers yourself.</p>
+
+      <p>Contribution fees vary between providers, so it's worth understanding what different providers offer. Providers must have a publicly available client contribution policy that outlines how they set their fees.</p>
+
+      <h2>Support at Home</h2>
+
+      <p>Being assessed as eligible for Support at Home doesn't necessarily mean you can access services straight away. Access to funding depends on when funding becomes available, which is determined by the priority category assigned to you and the date of your approval — both included in your Notice of Decision.</p>
+
+      <p>When funding becomes available, you will receive a letter letting you know. You will then have 56 days from the date of that letter to enter into a service agreement with a provider. If you need more time, contact My Aged Care and ask for an extension.</p>
+
+      <p>In the time between receiving your eligibility notice and your funding letter, you can start talking to providers and getting a feel for what services and costs look like.</p>
+
+      <p>To understand what you may need to contribute, use the Support at Home fee estimator. You will need your pension status, annual income, annual pension income and total value of your assets (not including your home).</p>
+
+      <p>👉 <a href="https://www.myagedcare.gov.au/support-at-home-fee-estimator" target="_blank" style="color: var(--sage); font-weight: 500;">Support at Home fee estimator — myagedcare.gov.au</a></p>
+
+      <h2>Residential Aged Care</h2>
+
+      <p>If your Notice of Decision includes that you are eligible for residential aged care and you have decided that is what is needed, it is time to look at the costs involved and find an aged care home that meets your needs. Understanding exactly what you will pay requires a means assessment, which takes time — so it can be helpful to get started early. There are free estimation tools to help and you can apply to have a means assessment to understand real costs. You can also seek independent financial advice.</p>
+
+      <p><em>Estimate the fees</em></p>
+
+      <p>To get a sense of the costs you might face, use the aged care home fee estimator on the My Aged Care website. You will need your total annual income, the total value of your financial and non-financial assets, and the market value of your home if you own one.</p>
+
+      <p>👉 <a href="https://www.myagedcare.gov.au/aged-care-home-fee-estimator" target="_blank" style="color: var(--sage); font-weight: 500;">Aged care home fee estimator — myagedcare.gov.au</a></p>
+
+      <p><em>Know the actual costs — means assessment and fee advice letter</em></p>
+
+      <p>To find out your actual costs you will need a means assessment and fee advice letter from Services Australia. If you are a veteran receiving a means-tested payment, DVA may do the assessment — check with DVA or Services Australia if you're unsure.</p>
+
+      <p>You can get a means assessment at any time, even before you are ready to enter a home. The fee advice letter is valid for 120 days from the date of your assessment.</p>
+
+      <p>You can apply online or by completing a form and providing it to Services Australia. You will be asked to provide information on your income and assets, and your partner's if applicable.</p>
+
+      <p>👉 <a href="https://www.servicesaustralia.gov.au/aged-care-calculation-of-your-cost-of-care" target="_blank" style="color: var(--sage); font-weight: 500;">Aged care calculation of your cost of care — Services Australia</a></p>
+
+      <h2>How to find a provider</h2>
+
+      <p>You can find providers by talking to people you know who are already accessing services or residential aged care, searching the internet, and using the Find a Provider tool on the My Aged Care website.</p>
+
+      <p><em>Find a Provider tool</em></p>
+
+      <p>The Find a Provider tool on the My Aged Care website lets you search for providers by program, services, care needs, costs, location and many other criteria. You can also create a shortlist of providers and compare up to three at a time.</p>
+
+      <p>👉 <a href="https://www.myagedcare.gov.au/find-a-provider" target="_blank" style="color: var(--sage); font-weight: 500;">Find a Provider — myagedcare.gov.au</a></p>
+
+      <p><em>Star ratings for aged care homes</em></p>
+
+      <p>The Find a Provider tool includes a star rating for aged care homes — between 1 and 5 — based on the quality of care provided. Ratings are assessed by the Australian Government. For more information see the My Aged Care website and the Star Ratings Fact Sheet for older people.</p>
+
+      <p>👉 <a href="https://www.myagedcare.gov.au/star-ratings" target="_blank" style="color: var(--sage); font-weight: 500;">Star ratings for aged care homes — myagedcare.gov.au</a></p>
+
+      <p><em>Don't wait — call providers early</em></p>
+
+      <p>Reaching out to providers before you have funding in place is worth doing. Providers are experienced at helping people understand what comes next, what services they offer, how much things cost, and how the whole process works in practice. A phone call can answer a lot of questions and help you feel much more confident about what's ahead — and it doesn't commit you to anything.</p>
+
+      <div class="tips-box">
+        <div class="tips-box-header">
+          <span class="tips-box-icon">💡</span>
+          <span class="tips-box-title">Tips and Questions</span>
+        </div>
+        <h3>Tips</h3>
+        <ul>
+          <li>Don't wait until you have funding to start looking at providers — research takes time and the right fit isn't always the first one you find</li>
+          <li>If you've been approved for residential care, visit more than one facility before deciding</li>
+          <li>If you disagree with the outcome, act quickly — you only have 28 days to request an internal review</li>
+          <li>Get your GP or a specialist to provide a supporting letter if you're requesting a review — it strengthens your case considerably</li>
+          <li>If navigating this feels overwhelming, contact the Aged Care Advocacy Line on 1800 700 600 — they're free, independent, and experienced</li>
+        </ul>
+        <h3>Questions to ask</h3>
+        <ul>
+          <li>What am I approved for and what does that mean in practical terms?</li>
+          <li>How long is the expected wait for my level of support?</li>
+          <li>Is there anything I can access while I'm waiting?</li>
+          <li>What are my options if I need support urgently before funding is allocated?</li>
+          <li>If I'm not approved, what else is available to me?</li>
+        </ul>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--mid-grey); margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--light-grey);"><em>Sources: <a href="https://www.myagedcare.gov.au/assessment-outcome-support-at-home" target="_blank" style="color: var(--sage);">myagedcare.gov.au/assessment-outcome-support-at-home</a> · <a href="https://www.myagedcare.gov.au/receiving-your-assessment-outcome" target="_blank" style="color: var(--sage);">myagedcare.gov.au/receiving-your-assessment-outcome</a> · <a href="https://www.myagedcare.gov.au/understanding-your-rights-and-how-raise-concerns" target="_blank" style="color: var(--sage);">myagedcare.gov.au/understanding-your-rights-and-how-raise-concerns</a></em></p>
+    </div>
+
+    <div class="section-nav-footer">
+      <button class="section-nav-btn" onclick="showSection('preparing')">
+        <span class="section-nav-label">← Previous</span>
+        <span class="section-nav-title">Preparing for Assessment</span>
+      </button>
+      <button class="section-nav-btn next" onclick="showHome()">
+        <span class="section-nav-label">Next →</span>
+        <span class="section-nav-title">Support at Home</span>
       </button>
     </div>
   </div>
